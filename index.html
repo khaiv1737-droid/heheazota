@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Tổng Hợp Môn Học Giữa Kì 1</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --link-color: #2c3e50;
+            --danger-color: #e74c3c;
+            --success-color: #2ecc71;
+        }
+
+        body, html {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- GIAO DIỆN BẢO MẬT (LOCKSCREEN) --- */
+        #lock-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: all 0.5s ease;
+        }
+
+        .auth-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            transform: scale(1);
+            transition: transform 0.3s;
+        }
+
+        .auth-box h2 {
+            margin-top: 0;
+            color: var(--link-color);
+            font-size: 1.8rem;
+        }
+
+        .auth-box input[type="password"] {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 20px 0 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            text-align: center;
+        }
+
+        .auth-box input[type="password"]:focus {
+            border-color: var(--primary-color);
+        }
+
+        .auth-box button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        .auth-box button:hover {
+            background-color: #357abd;
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--danger-color);
+            min-height: 20px;
+        }
+
+        /* Màn hình đóng băng nghiêm ngặt khi bị cấm */
+        .frozen-screen {
+            background: #000000 !important;
+            color: #ff3333 !important;
+            cursor: not-allowed;
+        }
+        .frozen-screen .auth-box {
+            background: #111 !important;
+            border: 3px solid var(--danger-color);
+            color: #fff;
+            animation: shake 0.2s infinite;
+        }
+        .frozen-screen input, .frozen-screen button {
+            display: none !important;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            100% { transform: translate(-1px, -2px) rotate(1deg); }
+        }
+
+        /* --- NỘI DUNG CHÍNH (MAIN CONTENT) --- */
+        #main-content {
+            display: none; /* Ẩn đi cho đến khi nhập đúng mật khẩu */
+            padding: 20px;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--link-color);
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            border-bottom: 4px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .subject-title {
+            font-size: 1.4rem;
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .link-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .btn-link {
+            display: inline-block;
+            background-color: #eef2f7;
+            color: var(--link-color);
+            text-decoration: none;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        /* --- HIỆU ỨNG ĐẶC SẮC & THÍCH THÚ KHI ẤN VÀO LINK --- */
+        .btn-link:active {
+            transform: scale(0.97);
+        }
+
+        .btn-link:hover {
+            background-color: var(--primary-color);
+            color: white;
+            padding-left: 25px;
+            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .sub-list .btn-link {
+            border-left-color: var(--success-color);
+        }
+        .sub-list .btn-link:hover {
+            background-color: var(--success-color);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4);
+        }
+
+        /* Hiệu ứng pháo hoa hạt (Partiles) bằng Canvas */
+        #effect-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 10000;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- MÀN HÌNH KHÓA BẢO MẬT AN TOÀN -->
+    <div id="lock-screen">
+        <div class="auth-box">
+            <h2>🔒 HỆ THỐNG BẢO MẬT</h2>
+            <p style="font-size: 14px; color: #666;">Vui lòng nhập mật khẩu xác thực để truy cập kho đề thi.</p>
+            <input type="password" id="password-input" placeholder="Nhập mật khẩu tại đây..." autocomplete="off">
+            <button onclick="checkPassword()">XÁC NHẬN</button>
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <!-- CANVAS DÀNH CHO HIỆU ỨNG ĐẶC SẮC -->
+    <canvas id="effect-canvas"></canvas>
+
+    <!-- GIAO DIỆN NỘI DUNG CHÍNH (CHỈ HIỂN THỊ KHI ĐĂNG NHẬP ĐÚNG) -->
+    <div id="main-content">
+        <div class="container">
+            <h1>📚 Tổng Hợp Đề Thi Giữa Kì 1</h1>
+
+            <!-- Môn Tin Học -->
+            <div class="subject-card">
+                <div class="subject-title">💻 Môn Tin Học</div>
+                <ul class="link-list">
+                    <li><a href="https://azota.vn" target="_blank" class="btn-link">👉 Làm bài thi Môn Tin Học</a></li>
+                </ul>
+            </div>
+
+            <!-- Môn GDKTPL -->
+            <div class="subject-card">
+                <div class="subject-title">⚖️ Môn GDKTPL</div>
+                <ul class="link-list">
+                    <li><a href="https://azota.vn" target="_blank" class="btn-link">👉 Làm bài thi Môn GDKTPL</a></li>
+                </ul>
+            </div>
+
+            <!-- Môn Lịch Sử -->
+            <div class="subject-card">
+                <div class="subject-title">📜 Môn Lịch Sử</div>
+                <ul class="link-list">
+                    <li><a href="https://azota.vn" target="_blank" class="btn-link">👉 Làm bài thi Môn Lịch Sử</a></li>
+                </ul>
+            </div>
+
+            <!-- Môn QPAN -->
+            <div class="subject-card">
+                <div class="subject-title">🛡️ Môn QPAN</div>
+                <div class="sub-list">
+                    <a href="https://azota.vn" target="_blank" class="btn-link">📖 Bài 1</a>
+                    <a href="https://azota.vn" target="_blank" class="btn-link">📖 Bài 2</a>
+                    <a href="https://azota.vn" target="_blank" class="btn-link">📖 Bài 3</a>
+                </div>
+            </div>
+
+            <!-- Môn CNN -->
+            <div class="subject-card">
+                <div class="subject-title">⚙️ Môn CNN (Công Nghệ)</div>
+                <ul class="link-list">
+                    <li><a href="https://azota.vn" target="_blank" class="btn-link">👉 Làm bài thi Môn CNN</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- XỬ LÝ BẢO MẬT VÀ ĐẶT MẬT KHẨU ---
+        let wrongAttempts = 0;
+        const CORRECT_PASSWORD = "LAMNHAT2009";
+
+        // Kiểm tra xem trình duyệt này trước đó đã bị cấm chưa (tránh F5 tải lại trang để gian lận)
+        if (localStorage.getItem("isBanned") === "true") {
+            triggerPermanentBan();
+        }
+
+        function checkPassword() {
+            const input = document.getElementById("password-input").value;
+            const msg = document.getElementById("message");
+
+            if (input === CORRECT_PASSWORD) {
+                // Nhập đúng: Ẩn màn hình khóa, hiện nội dung
+                document.getElementById("lock-screen").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("lock-screen").style.display = "none";
+                    document.getElementById("main-content").style.display = "flex";
+                }, 500);
+            } else {
+                wrongAttempts++;
+                  
